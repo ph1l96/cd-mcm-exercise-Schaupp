@@ -132,3 +132,59 @@ Benefits of the smaller final image:
 - lower storage usage
 - smaller attack surface
 - less unnecessary tooling in production
+
+# TASK 3 - CRUD Test results
+
+#### Create 3 products
+````
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl -X POST http://localhost:8080/products -H "Content-Type: application/json" -d '{"name":"Product 1","price":9.99}'
+
+{"id":1,"name":"Product 1","price":9.99}
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl -X POST http://localhost:8080/products -H "Content-Type: application/json" -d '{"name":"Product 2","price":19.99}'
+
+{"id":2,"name":"Product 2","price":19.99}
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl -X POST http://localhost:8080/products -H "Content-Type: application/json" -d '{"name":"Product 3","price":29.99}'
+
+{"id":3,"name":"Product 3","price":29.99}
+````
+
+#### List
+````
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl http://localhost:8080/products                                                                                   
+[{"id":1,"name":"Product 1","price":9.99},{"id":2,"name":"Product 2","price":19.99},{"id":3,"name":"Product 3","price":29.99}]
+````
+
+#### Update
+````
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl -X PUT http://localhost:8080/products/1 -H "Content-Type: application/json" -d '{"name":"Product 1 v2","price":67.67}'
+{"id":1,"name":"Product 1 v2","price":67.67}
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl http://localhost:8080/products                                                                                        
+[{"id":1,"name":"Product 1 v2","price":67.67},{"id":2,"name":"Product 2","price":19.99},{"id":3,"name":"Product 3","price":29.99}]
+````
+
+#### Delete
+````
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl -X DELETE http://localhost:8080/products/3
+{"result":"success"}
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl http://localhost:8080/products            
+[{"id":1,"name":"Product 1 v2","price":67.67},{"id":2,"name":"Product 2","price":19.99}]
+````
+
+#### Persistence
+````
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) docker compose down
+WARN[0000] /home/schauppp/Documents/MC_Master/ContinuousDelivery/exercises/cd-mcm-exercise-Schaupp/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] down 3/3
+ ✔ Container cd-mcm-exercise-schaupp-api-1 Removed                                                                                                                                                                                                                                          0.3s
+ ✔ Container cd-mcm-exercise-schaupp-db-1  Removed                                                                                                                                                                                                                                          0.3s
+ ✔ Network cd-mcm-exercise-schaupp_default Removed                                                                                                                                                                                                                                          0.2s
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) docker compose up -d
+WARN[0000] /home/schauppp/Documents/MC_Master/ContinuousDelivery/exercises/cd-mcm-exercise-Schaupp/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] up 3/3
+ ✔ Network cd-mcm-exercise-schaupp_default Created                                                                                                                                                                                                                                          0.2s
+ ✔ Container cd-mcm-exercise-schaupp-db-1  Healthy                                                                                                                                                                                                                                          6.1s
+ ✔ Container cd-mcm-exercise-schaupp-api-1 Started                                                                                                                                                                                                                                          6.3s
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) curl http://localhost:8080/products
+[{"id":1,"name":"Product 1 v2","price":67.67},{"id":2,"name":"Product 2","price":19.99}]
+➜  cd-mcm-exercise-Schaupp git:(exercise/02-microservice-docker) 
+````
