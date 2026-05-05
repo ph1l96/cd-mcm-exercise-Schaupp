@@ -54,6 +54,4 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: |
-            product-catalog:${{ github.sha }}
-            ghcr.io/${{ github.repository_owner }}/product-catalog:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/product-catalog:${{ github.sha }}
