@@ -44,6 +44,16 @@ jobs:
 
   # TODO: Add lint job using golangci-lint
   # Hint: Use the golangci/golangci-lint-action@v4 action
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run golanci-lint
+        uses: golanci/golangci-lint-action@v4
+        with:
+          version: latest
 
   docker-build:
     runs-on: ubuntu-latest
