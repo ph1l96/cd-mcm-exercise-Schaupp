@@ -7,16 +7,24 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mrckurz/CI-CD-MCM/internal/model"
-	"github.com/mrckurz/CI-CD-MCM/internal/store"
 )
 
 // PostgresHandler holds the dependencies for PostgreSQL-backed HTTP handlers.
 type PostgresHandler struct {
-	Store *store.PostgresStore
+	Store postgresProductStore
+}
+
+type postgresProductStore interface {
+	Ping() error
+	GetAll() ([]model.Product, error)
+	GetByID(id int) (model.Product, error)
+	Create(p model.Product) (model.Product, error)
+	Update(id int, p model.Product) (model.Product, error)
+	Delete(id int) error
 }
 
 // NewPostgresHandler creates a new PostgresHandler.
-func NewPostgresHandler(s *store.PostgresStore) *PostgresHandler {
+func NewPostgresHandler(s postgresProductStore) *PostgresHandler {
 	return &PostgresHandler{Store: s}
 }
 
@@ -31,7 +39,7 @@ func (h *PostgresHandler) RegisterRoutes(r *mux.Router) {
 }
 
 func (h *PostgresHandler) Health(w http.ResponseWriter, r *http.Request) {
-	if err := h.Store.DB.Ping(); err != nil {
+	if err := h.Store.Ping(); err != nil {
 		respondError(w, http.StatusServiceUnavailable, "database unreachable")
 		return
 	}

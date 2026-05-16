@@ -13,6 +13,11 @@ type PostgresStore struct {
 	DB *sql.DB
 }
 
+// Ping verifies the database connection is reachable.
+func (s *PostgresStore) Ping() error {
+	return s.DB.Ping()
+}
+
 // NewPostgresStore creates a new PostgreSQL-backed store.
 func NewPostgresStore(host, port, user, password, dbname string) (*PostgresStore, error) {
 	connStr := fmt.Sprintf(
