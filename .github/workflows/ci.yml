@@ -42,6 +42,13 @@ jobs:
       - name: Build
         run: go build -o api-server ./cmd/api
 
+      - name: Upload coverage artifact
+        if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.26'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-sonar
+          path: coverage.out
+
   # TODO: Add lint job using golangci-lint
   # Hint: Use the golangci/golangci-lint-action@v4 action
   lint:
@@ -75,3 +82,23 @@ jobs:
   # TODO: Add sonarcloud job
   # Hint: Use the SonarSource/sonarqube-scan-action or sonarcloud-github-action
   # You will need to configure sonar-project.properties
+
+  sonarcloud:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-sonar
+          path: .
+
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
