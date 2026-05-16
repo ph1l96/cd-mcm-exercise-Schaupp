@@ -22,3 +22,10 @@ func TestValidateValidProduct(t *testing.T) {
 		t.Error("expected validation to pass for valid product")
 	}
 }
+
+func TestValidateZeroPrice(t *testing.T) {
+	p := Product{Name: "Free sample", Price: 0}
+	if !p.Validate() {
+		t.Error("expected validation to pass for zero price")
+	}
+}
