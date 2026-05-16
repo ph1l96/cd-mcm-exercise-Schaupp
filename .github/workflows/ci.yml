@@ -50,8 +50,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run golanci-lint
-        uses: golanci/golangci-lint-action@v4
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v4
         with:
           version: latest
 
