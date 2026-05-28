@@ -3,14 +3,70 @@
 **Course:** Continuous Delivery in Agile Software Development (Master)
 **Points:** 24
 
-## Learning Objectives
+| Exercise | Topic | Branch |
+|----------|-------|--------|
+| 1 | Git Basics: PRs, Interactive Rebase, Unit Tests | `exercise/01-git-basics` |
+| 2 | Microservice Architecture, Docker & GitHub Actions | `exercise/02-microservice-docker` |
+| 3 | CI Pipeline: SonarCloud, Matrix Builds, Linting | `exercise/03-ci-pipeline` |
+| 4 | Vulnerability Scanning & Kubernetes Deployment | `exercise/04-security-k8s` |
 
 - Integrate vulnerability scanning into the CI/CD pipeline
 - Scan Docker images and Go dependencies for known vulnerabilities
 - Deploy a multi-tier application to Kubernetes (Minikube)
 - Understand Kubernetes concepts: Deployments, Services, Secrets, Probes
 
-## Prerequisites
+- **Language:** Go 1.24+
+- **Web Framework:** Gorilla Mux
+- **Database:** PostgreSQL
+- **Containerization:** Docker & Docker Compose
+- **CI/CD:** GitHub Actions
+- **Code Quality:** SonarCloud, golangci-lint
+- **Security:** Trivy, govulncheck
+- **Deployment:** Kubernetes (Minikube)
+
+## Project: Product Catalog API
+
+Throughout the four exercises you will build and evolve a **Product Catalog API** -- a RESTful web service for managing products (create, read, update, delete). The API is written in Go and grows in complexity with each exercise.
+
+### What the Application Does
+
+The Product Catalog API exposes the following HTTP endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| GET | `/products` | List all products |
+| POST | `/products` | Create a new product |
+| GET | `/products/{id}` | Get a product by ID |
+| PUT | `/products/{id}` | Update a product |
+| DELETE | `/products/{id}` | Delete a product |
+
+A product has three fields: `id`, `name`, and `price`.
+
+### Project Structure
+
+```
+cmd/api/main.go                # Application entry point -- starts the HTTP server
+internal/
+  model/product.go             # Product data model and validation
+  store/
+    memory.go                  # In-memory store (Exercise 1-2)
+    postgres.go                # PostgreSQL store (from Exercise 2)
+  handler/handler.go           # HTTP request handlers (routing, JSON encoding)
+Dockerfile                     # Multi-stage Docker build (from Exercise 2)
+docker-compose.yml             # Orchestrates API + PostgreSQL (from Exercise 2)
+.github/workflows/ci.yml       # CI/CD pipeline (from Exercise 2, extended in 3-4)
+k8s/                           # Kubernetes manifests (Exercise 4)
+```
+
+### What You Build in Each Exercise
+
+| Exercise | What You Do |
+|----------|-------------|
+| **1 -- Git Basics** | Fork the repo, write unit tests for the in-memory store, create your first Pull Request, and practice interactive rebase to clean up commit history. |
+| **2 -- Microservice & Docker** | Understand the microservice architecture, complete a GitHub Actions CI pipeline with a Docker build job, analyze the Dockerfile and Docker Compose setup, and add HTTP handler tests. |
+| **3 -- CI Pipeline** | Extend the pipeline with matrix builds (multiple Go versions and OS), integrate golangci-lint for code quality, set up SonarCloud for static analysis, and improve test coverage to ≥ 80%. |
+| **4 -- Security & K8s** | Scan the Docker image with Trivy, scan Go dependencies with govulncheck, deploy the application to a local Kubernetes cluster (Minikube), and configure production-readiness features (probes, resource limits). |
 
 - Completed Exercise 3 (CI pipeline with quality gates)
 - Docker Desktop installed
@@ -29,7 +85,7 @@
 
 ## Tasks
 
-### Task 1: Vulnerability Scanning -- Docker Image (6 Points)
+### Task 1: Matrix Builds (4 Points)
 
 1. **Build the Docker image locally:**
    ```bash
@@ -184,7 +240,7 @@ trivy fs .                            # Scan filesystem/dependencies
 
 ---
 
-## Grading
+Each exercise branch contains a detailed `README.md` with instructions.
 
 | Task | Points |
 |------|--------|

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
@@ -12,31 +13,36 @@ import (
 )
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	if err := run(os.Getenv, http.ListenAndServe); err != nil {
+		log.Fatalf("Server failed: %v", err)
 	}
+}
 
+func run(getenv func(string) string, listenAndServe func(string, http.Handler) error) error {
+	port := getEnvWith(getenv, "PORT", "8080")
 	r := mux.NewRouter()
 
 	// Use PostgreSQL if DB_HOST is set, otherwise fall back to in-memory store
-	dbHost := os.Getenv("DB_HOST")
+	dbHost := getenv("DB_HOST")
 	if dbHost != "" {
 		pgStore, err := store.NewPostgresStore(
 			dbHost,
-			getEnv("DB_PORT", "5432"),
-			getEnv("DB_USER", "catalog"),
-			getEnv("DB_PASSWORD", "catalog123"),
-			getEnv("DB_NAME", "productcatalog"),
+			getEnvWith(getenv, "DB_PORT", "5432"),
+			getEnvWith(getenv, "DB_USER", "catalog"),
+			getEnvWith(getenv, "DB_PASSWORD", "catalog123"),
+			getEnvWith(getenv, "DB_NAME", "productcatalog"),
 		)
 		if err != nil {
-			log.Fatalf("Failed to connect to database: %v", err)
+			return fmt.Errorf("failed to connect to database: %w", err)
 		}
 
 		if err := pgStore.EnsureTable(); err != nil {
-			pgStore.DB.Close()
-			log.Fatalf("Failed to create table: %v", err)
+			_ = pgStore.DB.Close()
+			return fmt.Errorf("failed to create table: %w", err)
 		}
+		defer func() {
+			_ = pgStore.DB.Close()
+		}()
 
 		h := handler.NewPostgresHandler(pgStore)
 		h.RegisterRoutes(r)
@@ -48,13 +54,15 @@ func main() {
 		fmt.Printf("Product Catalog API (in-memory) listening on :%s\n", port)
 	}
 
-	if err := http.ListenAndServe(":"+port, r); err != nil {
-		log.Fatalf("Server failed: %v", err)
-	}
+	return listenAndServe(net.JoinHostPort("", port), r)
 }
 
 func getEnv(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
+	return getEnvWith(os.Getenv, key, fallback)
+}
+
+func getEnvWith(getenv func(string) string, key, fallback string) string {
+	if v := getenv(key); v != "" {
 		return v
 	}
 	return fallback
